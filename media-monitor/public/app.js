@@ -7,6 +7,13 @@ const KNOWN_SOURCES = [
   { slug: "instagram", label: "Instagram" },
 ];
 
+const SOURCE_COLOR_SLOT = new Map(KNOWN_SOURCES.map((s, i) => [s.slug, (i % 6) + 1]));
+
+function colorForSource(slug) {
+  const slot = SOURCE_COLOR_SLOT.get(slug) ?? 1;
+  return `var(--series-${slot})`;
+}
+
 function populateSourceOptions() {
   const select = document.getElementById("source");
   for (const { slug, label } of KNOWN_SOURCES) {
@@ -47,7 +54,7 @@ function showStatus(message, isError = false) {
   if (message) status.classList.add(isError ? "error" : "info");
 }
 
-function renderBars(container, buckets) {
+function renderBars(container, buckets, { categorical = false } = {}) {
   if (!buckets || buckets.length === 0) {
     container.innerHTML = '<p class="empty-state">No data.</p>';
     return;
@@ -59,15 +66,42 @@ function renderBars(container, buckets) {
     .map((b) => {
       const label = escapeHtml(b.label ?? b.key ?? "unknown");
       const widthPct = max > 0 ? Math.round((b.count / max) * 100) : 0;
+      const color = categorical ? colorForSource(b.key) : "var(--accent)";
+      const swatch = categorical
+        ? `<span class="bar-swatch" style="background:${color}"></span>`
+        : "";
       return `
         <div class="bar-row">
-          <span class="bar-label" title="${label}">${label}</span>
-          <span class="bar-track"><span class="bar-fill" style="width:${widthPct}%"></span></span>
+          <span class="bar-label" title="${label}">${swatch}${label}</span>
+          <span class="bar-track"><span class="bar-fill" style="width:${widthPct}%;background:${color}"></span></span>
           <span class="bar-count">${b.count}</span>
         </div>
       `;
     })
     .join("");
+}
+
+function renderStatTiles(list, bySource, byDay) {
+  const container = document.getElementById("stat-tiles");
+  const total = list.meta?.total ?? 0;
+  const outletCount = bySource.buckets?.length ?? 0;
+  const days = (byDay.buckets ?? []).filter((b) => b.key !== "unknown");
+  const range = days.length ? `${days[0].key} → ${days[days.length - 1].key}` : "—";
+
+  container.innerHTML = `
+    <div class="stat-tile stat-hero">
+      <span class="stat-label">Mentions</span>
+      <span class="stat-value">${total}</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-label">Outlets</span>
+      <span class="stat-value">${outletCount}</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-label">Date range</span>
+      <span class="stat-value stat-value-small">${escapeHtml(range)}</span>
+    </div>
+  `;
 }
 
 function renderList(items) {
@@ -99,7 +133,9 @@ function renderList(items) {
           <h3>${titleHtml}</h3>
           <div class="mention-meta">
             <span class="badge">${escapeHtml(item.source_display ?? item.source)}</span>
+            <span class="dot">&middot;</span>
             <span class="meta-date">${date}</span>
+            <span class="dot">&middot;</span>
             <span class="meta-engagement">${item.engagement} eng.</span>
           </div>
           <p class="mention-snippet">${snippet}</p>
@@ -128,7 +164,8 @@ async function load() {
       }),
     ]);
 
-    renderBars(document.getElementById("by-source"), bySource.buckets);
+    renderStatTiles(list, bySource, byDay);
+    renderBars(document.getElementById("by-source"), bySource.buckets, { categorical: true });
     renderBars(document.getElementById("by-day"), byDay.buckets);
     renderList(list.data);
     showStatus("");
