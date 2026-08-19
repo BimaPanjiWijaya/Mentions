@@ -23,16 +23,6 @@ function stripTrailingSlashes(path: string): string {
   return path.slice(0, end);
 }
 
-/**
- * Produces a comparable identity for a URL.
- *
- *   https://www.thestar.com.my/business/2026/08/10/ringgit-strengthens?utm_source=fb
- *   -> thestar.com.my/business/2026/08/10/ringgit-strengthens
- *
- * The scheme is dropped entirely so http/https variants of the same
- * article collapse. Tracking parameters are removed; remaining
- * parameters are sorted so ordering does not affect identity.
- */
 export function canonicalizeUrl(input: unknown): string | null {
   if (typeof input !== "string") return null;
 
@@ -49,7 +39,7 @@ export function canonicalizeUrl(input: unknown): string | null {
   if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
 
   let host = stripHostPrefix(parsed.hostname.toLowerCase());
-  if (host === "x.com") host = "twitter.com"; // same platform, two domains
+  if (host === "x.com") host = "twitter.com";
 
   let path = stripTrailingSlashes(parsed.pathname);
   if (path === "") path = "/";

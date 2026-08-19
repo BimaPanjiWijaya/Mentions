@@ -2,10 +2,6 @@ import { pool } from "./db.js";
 import type { CanonicalMention, MatchLayer } from "./types.js";
 import { config } from "./config.js";
 
-/**
- * Advisory lock key for bulk ingest. Any constant works; it just
- * has to be the same across processes.
- */
 const INGEST_LOCK_KEY = 8_812_340_091;
 
 export interface IngestSummary {
@@ -20,10 +16,6 @@ interface ExistingRow {
   match_layer: Exclude<MatchLayer, "new">;
 }
 
-/**
- * Finds an existing mention using the three-layer rule, in priority
- * order, in a single round trip.
- */
 async function findExisting(
   client: import("pg").PoolClient,
   record: CanonicalMention,
@@ -104,11 +96,6 @@ async function insertMention(
   return rows[0].id as number;
 }
 
-/**
- * Merge policy, mirrored from dedupe.mergeInto:
- *   - never overwrite a known value with NULL
- *   - engagement keeps the highest value observed
- */
 async function mergeMention(
   client: import("pg").PoolClient,
   id: number,
@@ -181,18 +168,6 @@ async function recordObservations(
   return recorded;
 }
 
-/**
- * Writes a batch of already-deduplicated records.
- *
- * The whole batch runs in one transaction behind a transaction-scoped
- * advisory lock. The lock serialises concurrent bulk ingests, which
- * removes a read-then-write race: two workers could otherwise both
- * find no match and both insert.
- *
- * Trade-off: bulk ingest cannot run in parallel. Acceptable here,
- * because this is an internal pipeline endpoint that runs on a
- * schedule, not a user-facing write path.
- */
 export async function ingestCanonical(
   records: CanonicalMention[],
 ): Promise<IngestSummary> {
@@ -242,10 +217,6 @@ export async function ingestCanonical(
   }
 }
 
-// ------------------------------------------------------------------
-// Search
-// ------------------------------------------------------------------
-
 export interface SearchParams {
   q?: string;
   source?: string;
@@ -261,7 +232,6 @@ interface WhereClause {
   values: unknown[];
 }
 
-/** Shared by /mentions and /mentions/stats so both filter identically. */
 function buildWhere(params: SearchParams): WhereClause {
   const conditions: string[] = [];
   const values: unknown[] = [];
@@ -292,11 +262,6 @@ function buildWhere(params: SearchParams): WhereClause {
   };
 }
 
-/**
- * Sort order is always fully deterministic: every option ends with
- * `id DESC` as a tiebreaker. Without it, rows with equal sort keys
- * can appear on two different pages, or vanish entirely.
- */
 function buildOrderBy(params: SearchParams, qParamIndex: number | null): string {
   switch (params.sort) {
     case "published_asc":
@@ -355,10 +320,6 @@ export async function searchMentions(params: SearchParams) {
   };
 }
 
-// ------------------------------------------------------------------
-// Stats
-// ------------------------------------------------------------------
-
 export async function statsBySource(params: SearchParams) {
   const where = buildWhere(params);
 
@@ -383,9 +344,6 @@ export async function statsByDay(params: SearchParams) {
   const values = [...where.values, config.reportingTimezone];
   const tzIndex = values.length;
 
-  // Mentions with an unknown publication date get their own bucket
-  // instead of being silently dropped, so the buckets always sum to
-  // the total returned by /mentions with the same filters.
   const sql = `
     SELECT
       COALESCE(

@@ -14,23 +14,14 @@ const NAMED_ENTITIES: Record<string, string> = {
   ldquo: "“",
 };
 
-/** Tags whose closing tag should leave a space, so words don't run together. */
 const BLOCK_TAGS = new Set([
   "p", "div", "li", "tr", "br",
   "h1", "h2", "h3", "h4", "h5", "h6",
   "section", "article",
 ]);
 
-/** Tags whose content must be discarded entirely, not just the tags. */
 const STRIP_CONTENT_TAGS = new Set(["script", "style"]);
 
-/**
- * Removes markup by scanning character by character.
- *
- * Script and style blocks are removed WITH their contents - the seed
- * data contains `<script>alert(1)</script>`, and a naive tag-stripper
- * that only removes the tags would leave `alert(1)` behind as plain text.
- */
 export function stripHtml(input: string): string {
   let result = "";
   let i = 0;
@@ -45,7 +36,6 @@ export function stripHtml(input: string): string {
       continue;
     }
 
-    // HTML comment: <!-- ... -->
     if (input.startsWith("<!--", i)) {
       const end = input.indexOf("-->", i + 4);
       i = end === -1 ? input.length : end + 3;
@@ -55,7 +45,6 @@ export function stripHtml(input: string): string {
 
     const closeIdx = input.indexOf(">", i);
     if (closeIdx === -1) {
-      // Unclosed tag: nothing sensible to do with the rest, stop here.
       break;
     }
 
@@ -84,7 +73,6 @@ export function stripHtml(input: string): string {
   return result;
 }
 
-/** Extracts the tag name from the text between `<` and `>`, e.g. "/p" -> "p". */
 function readTagName(rawTag: string): string {
   let trimmed = rawTag.trim();
   if (trimmed.startsWith("/")) trimmed = trimmed.slice(1);
@@ -106,8 +94,6 @@ export function decodeEntities(input: string): string {
 
     if (ch === "&") {
       const semiIdx = input.indexOf(";", i);
-      // Real entities are short; cap the lookahead so a stray "&" deep in
-      // plain text doesn't scan the rest of the string looking for ";".
       if (semiIdx !== -1 && semiIdx - i <= 10) {
         const entity = input.slice(i + 1, semiIdx);
         const decoded = decodeEntity(entity);
@@ -158,7 +144,6 @@ function isHexDigits(value: string): boolean {
   return true;
 }
 
-/** Collapses any run of whitespace (space, tab, newline) into one space. */
 function collapseWhitespace(input: string): string {
   let result = "";
   let lastWasSpace = false;
@@ -177,14 +162,6 @@ function collapseWhitespace(input: string): string {
   return result.trim();
 }
 
-/**
- * Order matters: strip tags FIRST, decode entities SECOND.
- *
- * If we decoded first, an input containing `&lt;script&gt;...`
- * would turn into a live `<script>` tag that the stripper then
- * has to handle. Decoding last means the output is never re-parsed
- * as markup.
- */
 export function cleanContent(input: unknown): string {
   if (typeof input !== "string") return "";
   return collapseWhitespace(decodeEntities(stripHtml(input)));

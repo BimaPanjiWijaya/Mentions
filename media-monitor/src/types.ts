@@ -1,4 +1,3 @@
-/** A record exactly as it arrives from the pipeline. */
 export interface RawMention {
   external_id?: unknown;
   source?: unknown;
@@ -11,7 +10,6 @@ export interface RawMention {
   [key: string]: unknown;
 }
 
-/** One accepted raw record, kept for audit. */
 export interface Observation {
   raw_hash: string;
   source_raw: string | null;
@@ -21,7 +19,6 @@ export interface Observation {
   engagement: number;
 }
 
-/** A deduplicated mention, ready to be written to the database. */
 export interface CanonicalMention {
   source: string;
   source_display: string;

@@ -1,8 +1,3 @@
-/**
- * Engagement arrives as a number (412), a formatted string ("1,204"),
- * compact notation ("1.2k"), or missing. Always returns a non-negative
- * integer.
- */
 export function parseEngagement(input: unknown): number {
   if (typeof input === "number") {
     return Number.isFinite(input) ? Math.max(0, Math.trunc(input)) : 0;
@@ -28,7 +23,6 @@ export function parseEngagement(input: unknown): number {
   return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
-/** Keeps only characters '0'-'9', dropping commas, spaces, everything else. */
 function keepDigitsOnly(value: string): string {
   let result = "";
   for (const ch of value) {
@@ -37,7 +31,6 @@ function keepDigitsOnly(value: string): string {
   return result;
 }
 
-/** Keeps digits and at most one decimal point, e.g. for "1.2k" -> 1.2. */
 function parseDecimal(value: string): number | null {
   let result = "";
   let sawDot = false;
@@ -49,7 +42,6 @@ function parseDecimal(value: string): number | null {
       result += ch;
       sawDot = true;
     }
-    // commas and anything else are silently dropped
   }
 
   if (result === "" || result === ".") return null;

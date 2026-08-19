@@ -17,7 +17,6 @@ function asTrimmedString(value: unknown): string | null {
   return trimmed === "" ? null : trimmed;
 }
 
-/** Converts one raw record into normalised shape. Pure. */
 export function normalizeRecord(raw: RawMention): CanonicalMention {
   const urlRaw = asTrimmedString(raw.url);
   const urlCanonical = canonicalizeUrl(raw.url);
@@ -60,7 +59,6 @@ export function normalizeRecord(raw: RawMention): CanonicalMention {
   };
 }
 
-/** Key order must not change the hash, so we sort keys. */
 function stableStringify(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "null";
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
@@ -70,10 +68,6 @@ function stableStringify(value: unknown): string {
   return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${stableStringify(v)}`).join(",")}}`;
 }
 
-/**
- * Merges `incoming` into `existing`, in place.
- * Rule: never overwrite a known value with an unknown one.
- */
 export function mergeInto(
   existing: CanonicalMention,
   incoming: CanonicalMention,
@@ -89,24 +83,11 @@ export function mergeInto(
   existing.url_canonical ??= incoming.url_canonical;
   existing.content_fingerprint ??= incoming.content_fingerprint;
 
-  // Engagement is a snapshot of a monotonically increasing counter.
   existing.engagement = Math.max(existing.engagement, incoming.engagement);
 
   existing.observations.push(...incoming.observations);
 }
 
-/**
- * Collapses duplicates WITHIN a single batch, before touching the
- * database.
- *
- * This is not an optimisation, it is a correctness requirement.
- * Records 1 and 2 of seed_mentions.json are duplicates of each
- * other. Sending both to Postgres in one statement would raise
- * "ON CONFLICT DO UPDATE command cannot affect row a second time".
- *
- * Keeping this as a pure function also makes the riskiest logic
- * in the codebase testable without a database.
- */
 export function dedupeBatch(records: RawMention[]): DedupeResult {
   const canonical: CanonicalMention[] = [];
   const rejected: RejectedRecord[] = [];
@@ -123,7 +104,6 @@ export function dedupeBatch(records: RawMention[]): DedupeResult {
 
     const record = normalizeRecord(raw);
 
-    // A record with no identity and no content is not a mention.
     if (!record.external_id && !record.url_canonical && !record.content_clean) {
       rejected.push({ index, reason: "no_identity_and_no_content" });
       return;
@@ -136,7 +116,6 @@ export function dedupeBatch(records: RawMention[]): DedupeResult {
       ? `${record.source}::${record.content_fingerprint}`
       : null;
 
-    // Layer order matters: strongest signal first.
     const existing =
       (externalKey ? byExternalId.get(externalKey) : undefined) ??
       (record.url_canonical ? byUrl.get(record.url_canonical) : undefined) ??

@@ -53,8 +53,6 @@ body {
   margin-inline: auto;
 }
 
-/* ---- Masthead ---- */
-
 .masthead {
   text-align: center;
   padding-bottom: 1.25rem;
@@ -95,8 +93,6 @@ body {
   padding: 0;
 }
 
-/* ---- Status line ---- */
-
 #status {
   max-width: 880px;
   margin: 0 auto;
@@ -113,8 +109,6 @@ body {
   color: var(--accent);
   font-weight: 600;
 }
-
-/* ---- Controls ---- */
 
 .controls {
   display: flex;
@@ -195,8 +189,6 @@ button#reset:hover {
   opacity: 1;
 }
 
-/* ---- Stats panels ---- */
-
 .stats-panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -264,8 +256,6 @@ button#reset:hover {
   color: var(--ink-muted);
 }
 
-/* ---- Mentions ---- */
-
 .mention-card {
   background: var(--paper-raised);
   border: 1px solid var(--rule);
@@ -332,8 +322,6 @@ button#reset:hover {
   font-style: italic;
   font-family: var(--font-serif);
 }
-
-/* ---- Colophon ---- */
 
 .colophon {
   margin-top: 3rem;

@@ -3,10 +3,6 @@ export interface NormalizedSource {
   display: string;
 }
 
-/**
- * Known outlets. The key is the raw value squashed to [a-z0-9].
- * "The Star", "thestar", "THE  STAR" all squash to "thestar".
- */
 const ALIASES: Record<string, NormalizedSource> = {
   thestar: { slug: "the-star", display: "The Star" },
   thestarcommy: { slug: "the-star", display: "The Star" },
@@ -36,7 +32,6 @@ function isAsciiAlnum(ch: string): boolean {
   return (ch >= "a" && ch <= "z") || (ch >= "0" && ch <= "9");
 }
 
-/** "The  Star!" -> "thestar" - used as a lookup key, spacing/casing-proof. */
 function squash(value: string): string {
   let result = "";
   for (const ch of value.toLowerCase()) {
@@ -45,10 +40,9 @@ function squash(value: string): string {
   return result;
 }
 
-/** "The  Star!" -> "the-star" - used as a stable, readable identifier. */
 function slugify(value: string): string {
   let result = "";
-  let lastWasDash = true; // suppresses a leading dash
+  let lastWasDash = true;
 
   for (const ch of value.toLowerCase().trim()) {
     if (isAsciiAlnum(ch)) {
@@ -64,21 +58,6 @@ function slugify(value: string): string {
   return result;
 }
 
-/**
- * Resolves the source field to a stable slug.
- *
- * Precedence:
- *   1. the `source` field, matched against the alias table
- *   2. the URL host, matched against the alias table
- *   3. a slug derived from the raw source field
- *   4. "unknown"
- *
- * Note: we deliberately IGNORE the external_id prefix as evidence.
- * In the seed data, record `nst-40021` carries source "thestar" and
- * a thestar.com.my URL. The field and the URL agree; only the
- * scraper-assigned id prefix disagrees. Ids are opaque strings, not
- * a source of truth.
- */
 export function normalizeSource(
   rawSource: unknown,
   canonicalUrl?: string | null,

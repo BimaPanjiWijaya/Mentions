@@ -1,14 +1,5 @@
 import { z } from "zod";
 
-/**
- * Ingest validation is deliberately permissive.
- *
- * This endpoint's whole job is to accept messy upstream output.
- * Rejecting a batch because one record has a number where a string
- * was expected would defeat the purpose. We accept any array of
- * objects and let the normalisation layer decide what is usable;
- * unusable records are reported per-record, not fatally.
- */
 export const bulkIngestSchema = z.union([
   z.array(z.record(z.string(), z.unknown())),
   z.object({ mentions: z.array(z.record(z.string(), z.unknown())) }),
@@ -21,14 +12,6 @@ const isoOrDate = z
   })
   .transform((value) => new Date(value));
 
-/**
- * Base object shape, WITHOUT `.refine()`, so it can still be `.extend()`-ed.
- *
- * `.refine()` wraps a schema in a way that no longer exposes `.extend()` -
- * it stops being a plain object schema. Deriving searchQuerySchema and
- * statsQuerySchema from this shared base (instead of chaining statsQuerySchema
- * off of searchQuerySchema directly) avoids relying on that at all.
- */
 const searchQueryShape = z.object({
   q: z.string().trim().min(1).max(200).optional(),
   source: z.string().trim().min(1).max(100).optional(),
@@ -44,10 +27,6 @@ const searchQueryShape = z.object({
 const fromNotAfterTo = (value: { from?: Date; to?: Date }) =>
   !(value.from && value.to) || value.from <= value.to;
 
-/**
- * Query validation is strict, because these values come from a
- * human or a dashboard and a silent misparse produces a wrong chart.
- */
 export const searchQuerySchema = searchQueryShape.refine(fromNotAfterTo, {
   message: "`from` must not be after `to`",
   path: ["from"],

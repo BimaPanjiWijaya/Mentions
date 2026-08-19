@@ -11,7 +11,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 export function createApp() {
   const app = express();
 
-  // The seed file is ~30 KB, but real batches are much larger.
   app.use(express.json({ limit: "10mb" }));
 
   app.get("/health", async (_req, res) => {
@@ -24,18 +23,15 @@ export function createApp() {
   });
 
   app.use(ingestRouter);
-  app.use(statsRouter);   // registered before mentionsRouter: see note
+  app.use(statsRouter);
   app.use(mentionsRouter);
 
-  // Optional read-only dashboard
   app.use(express.static(join(__dirname, "..", "public")));
 
   app.use((_req, res) => {
     res.status(404).json({ error: "not_found" });
   });
 
-  // Centralised error handler. Four arguments are required for
-  // Express to recognise this as an error handler.
   app.use(
     (
       error: Error,

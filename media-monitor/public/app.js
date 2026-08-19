@@ -17,7 +17,6 @@ function populateSourceOptions() {
   }
 }
 
-/** Reads the 4 filter inputs and builds a URLSearchParams for the API. */
 function currentQuery() {
   const q = document.getElementById("q").value.trim();
   const source = document.getElementById("source").value;
@@ -32,7 +31,6 @@ function currentQuery() {
   return params;
 }
 
-/** Escapes & < > " ' before content is placed into innerHTML. */
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -49,7 +47,6 @@ function showStatus(message, isError = false) {
   if (message) status.classList.add(isError ? "error" : "info");
 }
 
-/** Renders a {key, count}[] bucket list as a simple horizontal bar chart. */
 function renderBars(container, buckets) {
   if (!buckets || buckets.length === 0) {
     container.innerHTML = '<p class="empty-state">No data.</p>';
@@ -134,7 +131,7 @@ async function load() {
     renderBars(document.getElementById("by-source"), bySource.buckets);
     renderBars(document.getElementById("by-day"), byDay.buckets);
     renderList(list.data);
-    showStatus(""); // clear status after a successful render
+    showStatus("");
   } catch (err) {
     console.error(err);
     showStatus("Failed to load mentions. Is the server running?", true);

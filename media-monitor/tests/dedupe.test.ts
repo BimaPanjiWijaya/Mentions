@@ -22,9 +22,7 @@ describe("dedupeBatch on the real seed file", () => {
       (m) => m.url_canonical?.includes("ringgit-strengthens"),
     );
     expect(ringgit).toBeDefined();
-    // three raw records collapsed into one mention
     expect(ringgit!.observations).toHaveLength(3);
-    // engagement keeps the highest snapshot seen: 412, 415, "1,204"
     expect(ringgit!.engagement).toBe(1204);
   });
 
@@ -33,13 +31,10 @@ describe("dedupeBatch on the real seed file", () => {
       m.title?.toLowerCase().includes("gdp outlook"),
     );
     expect(gdp).toHaveLength(1);
-    // mkn-1201 had a null date; mkn-1202 supplied it
     expect(gdp[0]!.published_at?.toISOString()).toBe("2026-08-11T00:00:00.000Z");
   });
 
   it("keeps the same story from two different outlets as two mentions", () => {
-    // This is the load-bearing assertion. Collapsing these would
-    // destroy the number the product exists to report.
     const tourism = result.canonical.filter((m) =>
       m.title?.toLowerCase().includes("tourism arrivals"),
     );

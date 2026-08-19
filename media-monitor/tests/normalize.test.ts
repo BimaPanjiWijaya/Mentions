@@ -19,8 +19,6 @@ describe("parsePublishedAt", () => {
   });
 
   it("treats a naive timestamp as UTC, not local time", () => {
-    // Regression guard: if this ever parses as MYT, nst-40021 would
-    // land five hours BEFORE the article it is a re-scrape of.
     expect(parsePublishedAt("2026-08-10 08:20:00")?.toISOString()).toBe(
       "2026-08-10T08:20:00.000Z",
     );
@@ -33,7 +31,6 @@ describe("parsePublishedAt", () => {
   });
 
   it("reads slash dates as day-first", () => {
-    // 11 August, not 8 November. The whole dataset sits in August.
     expect(parsePublishedAt("11/08/2026")?.toISOString()).toBe(
       "2026-08-11T00:00:00.000Z",
     );
@@ -89,7 +86,6 @@ describe("cleanContent", () => {
     expect(cleanContent("&lt;script&gt;alert(1)&lt;/script&gt;")).toBe(
       "<script>alert(1)</script>",
     );
-    // Decoded for display, but never re-parsed as HTML.
   });
 });
 
