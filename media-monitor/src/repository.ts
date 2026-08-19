@@ -1,5 +1,6 @@
 import { pool } from "./db.js";
 import type { CanonicalMention, MatchLayer } from "./types.js";
+import { config } from "./config.js";
 
 /**
  * Advisory lock key for bulk ingest. Any constant works; it just
@@ -352,4 +353,53 @@ export async function searchMentions(params: SearchParams) {
       sort: params.sort,
     },
   };
+}
+
+// ------------------------------------------------------------------
+// Stats
+// ------------------------------------------------------------------
+
+export async function statsBySource(params: SearchParams) {
+  const where = buildWhere(params);
+
+  const sql = `
+    SELECT
+      source            AS key,
+      max(source_display) AS label,
+      count(*)::int     AS count,
+      sum(engagement)::bigint AS total_engagement
+    FROM mentions
+    ${where.sql}
+    GROUP BY source
+    ORDER BY count DESC, source ASC
+  `;
+
+  const { rows } = await pool.query(sql, where.values);
+  return rows;
+}
+
+export async function statsByDay(params: SearchParams) {
+  const where = buildWhere(params);
+  const values = [...where.values, config.reportingTimezone];
+  const tzIndex = values.length;
+
+  // Mentions with an unknown publication date get their own bucket
+  // instead of being silently dropped, so the buckets always sum to
+  // the total returned by /mentions with the same filters.
+  const sql = `
+    SELECT
+      COALESCE(
+        to_char((published_at AT TIME ZONE $${tzIndex})::date, 'YYYY-MM-DD'),
+        'unknown'
+      ) AS key,
+      count(*)::int AS count,
+      sum(engagement)::bigint AS total_engagement
+    FROM mentions
+    ${where.sql}
+    GROUP BY 1
+    ORDER BY 1 ASC
+  `;
+
+  const { rows } = await pool.query(sql, values);
+  return rows;
 }

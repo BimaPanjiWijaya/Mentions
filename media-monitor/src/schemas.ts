@@ -52,3 +52,12 @@ export const searchQuerySchema = searchQueryShape.refine(fromNotAfterTo, {
   message: "`from` must not be after `to`",
   path: ["from"],
 });
+
+export const statsQuerySchema = searchQueryShape
+  .extend({
+    group_by: z.enum(["source", "day"]),
+  })
+  .refine(fromNotAfterTo, {
+    message: "`from` must not be after `to`",
+    path: ["from"],
+  });
