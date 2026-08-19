@@ -240,3 +240,116 @@ export async function ingestCanonical(
     client.release();
   }
 }
+
+// ------------------------------------------------------------------
+// Search
+// ------------------------------------------------------------------
+
+export interface SearchParams {
+  q?: string;
+  source?: string;
+  from?: Date;
+  to?: Date;
+  page: number;
+  limit: number;
+  sort: "published_desc" | "published_asc" | "engagement_desc" | "relevance";
+}
+
+interface WhereClause {
+  sql: string;
+  values: unknown[];
+}
+
+/** Shared by /mentions and /mentions/stats so both filter identically. */
+function buildWhere(params: SearchParams): WhereClause {
+  const conditions: string[] = [];
+  const values: unknown[] = [];
+
+  if (params.q) {
+    values.push(params.q);
+    conditions.push(`search_vector @@ websearch_to_tsquery('english', $${values.length})`);
+  }
+
+  if (params.source) {
+    values.push(params.source.toLowerCase());
+    conditions.push(`source = $${values.length}`);
+  }
+
+  if (params.from) {
+    values.push(params.from);
+    conditions.push(`published_at >= $${values.length}`);
+  }
+
+  if (params.to) {
+    values.push(params.to);
+    conditions.push(`published_at <= $${values.length}`);
+  }
+
+  return {
+    sql: conditions.length ? `WHERE ${conditions.join(" AND ")}` : "",
+    values,
+  };
+}
+
+/**
+ * Sort order is always fully deterministic: every option ends with
+ * `id DESC` as a tiebreaker. Without it, rows with equal sort keys
+ * can appear on two different pages, or vanish entirely.
+ */
+function buildOrderBy(params: SearchParams, qParamIndex: number | null): string {
+  switch (params.sort) {
+    case "published_asc":
+      return "ORDER BY published_at ASC NULLS LAST, id DESC";
+    case "engagement_desc":
+      return "ORDER BY engagement DESC, published_at DESC NULLS LAST, id DESC";
+    case "relevance":
+      return qParamIndex
+        ? `ORDER BY ts_rank(search_vector, websearch_to_tsquery('english', $${qParamIndex})) DESC, published_at DESC NULLS LAST, id DESC`
+        : "ORDER BY published_at DESC NULLS LAST, id DESC";
+    case "published_desc":
+    default:
+      return "ORDER BY published_at DESC NULLS LAST, id DESC";
+  }
+}
+
+export async function searchMentions(params: SearchParams) {
+  const where = buildWhere(params);
+  const qParamIndex = params.q ? 1 : null;
+  const orderBy = buildOrderBy(params, qParamIndex);
+
+  const offset = (params.page - 1) * params.limit;
+  const limitIndex = where.values.length + 1;
+  const offsetIndex = where.values.length + 2;
+
+  const dataSql = `
+    SELECT
+      id, source, source_display, external_id,
+      title, content_clean AS content, author,
+      url_raw AS url, published_at, engagement,
+      first_seen_at, last_seen_at, ingest_count
+    FROM mentions
+    ${where.sql}
+    ${orderBy}
+    LIMIT $${limitIndex} OFFSET $${offsetIndex}
+  `;
+
+  const countSql = `SELECT count(*)::int AS total FROM mentions ${where.sql}`;
+
+  const [dataResult, countResult] = await Promise.all([
+    pool.query(dataSql, [...where.values, params.limit, offset]),
+    pool.query(countSql, where.values),
+  ]);
+
+  const total = countResult.rows[0].total as number;
+
+  return {
+    data: dataResult.rows,
+    meta: {
+      page: params.page,
+      limit: params.limit,
+      total,
+      total_pages: Math.max(1, Math.ceil(total / params.limit)),
+      sort: params.sort,
+    },
+  };
+}

@@ -2,6 +2,7 @@ import express from "express";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ingestRouter } from "./routes/ingest.js";
+import { mentionsRouter } from "./routes/mentions.js";
 import { pool } from "./db.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -22,6 +23,7 @@ export function createApp() {
   });
 
   app.use(ingestRouter);
+  app.use(mentionsRouter);
 
   // Optional read-only dashboard
   app.use(express.static(join(__dirname, "..", "public")));
