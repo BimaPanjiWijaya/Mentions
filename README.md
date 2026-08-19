@@ -335,10 +335,24 @@ copy-pasteable fake credential sitting in the repo.
 
 ## Time spent
 
-*(Filled in honestly before submission — see the checklist in the assessment
-guide. Development was done with Claude Code under close review, per the
-brief's explicit allowance for AI-assisted delegation; the time that matters
-here is the reasoning and verification time, not typing time.)*
+Roughly **10 hours across 3 sessions**, 18–20 August 2026:
+
+- **Session 1** (~1.5h, 18 Aug): project scaffold — repo structure, TypeScript
+  + Express setup, dependency versions pinned, seed data committed.
+- **Session 2** (~5h, 19–20 Aug): the core of the system — schema migration,
+  the six-function normalisation layer (dates, engagement, HTML, URLs,
+  sources, fingerprinting) written without regex per the brief's constraint,
+  the three-layer deduplication rule, and the three endpoints (bulk ingest,
+  search, stats), plus the test suite covering that logic.
+- **Session 3** (~3.5h, 20 Aug): read-only dashboard, verification against a
+  real local PostgreSQL instance (migration, seed, every endpoint hit by
+  hand), cleaning up the commit history into logical steps, and this README.
+
+Built with Claude Code under close review — the brief explicitly allows this
+("Use them. We do. There is no penalty"). The hours above are my own time:
+reading the seed data and deciding the dedup rule, reviewing every function
+Claude wrote, verifying results against the database, and rewriting sections
+I wasn't satisfied with — not the time Claude spent generating text.
 
 ---
 

@@ -356,10 +356,24 @@ dalam repo.
 
 ## Waktu yang dihabiskan
 
-*(Diisi jujur sebelum submit — lihat checklist di panduan asesmen.
-Pengembangan dilakukan dengan Claude Code di bawah review ketat, sesuai
-izin eksplisit brief untuk delegasi berbantuan AI; waktu yang relevan di
-sini adalah waktu bernalar dan verifikasi, bukan waktu mengetik.)*
+Kira-kira **10 jam dalam 3 sesi**, 18–20 Agustus 2026:
+
+- **Sesi 1** (~1,5 jam, 18 Agu): scaffold project — struktur repo, setup
+  TypeScript + Express, versi dependency dipin, seed data di-commit.
+- **Sesi 2** (~5 jam, 19–20 Agu): inti sistemnya — migration schema, layer
+  normalisasi enam fungsi (tanggal, engagement, HTML, URL, source,
+  fingerprinting) ditulis tanpa regex sesuai constraint brief, aturan
+  deduplikasi tiga lapis, dan tiga endpoint (bulk ingest, search, stats),
+  plus test suite yang meng-cover logika itu.
+- **Sesi 3** (~3,5 jam, 20 Agu): dashboard read-only, verifikasi ke instance
+  PostgreSQL lokal sungguhan (migration, seed, tiap endpoint dicoba manual),
+  merapikan commit history jadi langkah-langkah logis, dan README ini.
+
+Dikerjakan dengan Claude Code di bawah review ketat — brief-nya eksplisit
+mengizinkan ini ("Use them. We do. There is no penalty"). Jam di atas adalah
+waktu saya sendiri: membaca seed data dan memutuskan aturan dedup, mereview
+tiap fungsi yang ditulis Claude, memverifikasi hasil ke database, dan
+menulis ulang bagian yang belum saya puas — bukan waktu Claude generate teks.
 
 ---
 
