@@ -1,0 +1,211 @@
+:root {
+  --bg: #f7f7f8;
+  --panel: #ffffff;
+  --border: #e2e2e6;
+  --text: #1c1c1f;
+  --muted: #6b6b74;
+  --accent: #3457d5;
+  --accent-soft: #e9edfc;
+  --error: #c0362c;
+  --error-bg: #fbe9e7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 2rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+header h1 {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+code {
+  background: var(--accent-soft);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+#status {
+  min-height: 1.5rem;
+  margin: 1rem 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+#status:empty {
+  padding: 0;
+}
+
+#status.info {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+#status.error {
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+.field label {
+  color: var(--muted);
+}
+
+.field input,
+.field select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.field.actions {
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button#reset {
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.stats-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .stats-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stats-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.stats-panel h2 {
+  margin-top: 0;
+  font-size: 1rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 3rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.35rem 0;
+  font-size: 0.85rem;
+}
+
+.bar-row .bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.bar-track {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  height: 0.9rem;
+  overflow: hidden;
+}
+
+.bar-fill {
+  background: var(--accent);
+  height: 100%;
+  border-radius: 4px;
+}
+
+.bar-row .bar-count {
+  text-align: right;
+  color: var(--muted);
+}
+
+.mention-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.mention-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.mention-card h3 a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.mention-card h3 a:hover {
+  text-decoration: underline;
+}
+
+.mention-meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.mention-snippet {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.empty-state {
+  color: var(--muted);
+  font-style: italic;
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Media Mentions Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Media Mentions Dashboard</h1>
+    <p class="subtitle">
+      Read-only view over <code>/mentions</code> and <code>/mentions/stats</code>.
+    </p>
+  </header>
+
+  <div id="status" role="status"></div>
+
+  <section class="controls">
+    <div class="field">
+      <label for="q">Search</label>
+      <input type="text" id="q" placeholder="ringgit, flood, gdp..." />
+    </div>
+    <div class="field">
+      <label for="source">Source</label>
+      <select id="source">
+        <option value="">All sources</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="from">From</label>
+      <input type="date" id="from" />
+    </div>
+    <div class="field">
+      <label for="to">To</label>
+      <input type="date" id="to" />
+    </div>
+    <div class="field actions">
+      <button id="apply" type="button">Apply</button>
+      <button id="reset" type="button">Reset</button>
+    </div>
+  </section>
+
+  <section class="stats-panels">
+    <div class="stats-panel">
+      <h2>By source</h2>
+      <div id="by-source"></div>
+    </div>
+    <div class="stats-panel">
+      <h2>By day</h2>
+      <div id="by-day"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Mentions</h2>
+    <div id="list"></div>
+  </section>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
