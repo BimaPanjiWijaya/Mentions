@@ -101,7 +101,9 @@ function renderList(items) {
         <article class="mention-card">
           <h3>${titleHtml}</h3>
           <div class="mention-meta">
-            ${escapeHtml(item.source_display ?? item.source)} &middot; ${date} &middot; engagement ${item.engagement}
+            <span class="badge">${escapeHtml(item.source_display ?? item.source)}</span>
+            <span class="meta-date">${date}</span>
+            <span class="meta-engagement">${item.engagement} eng.</span>
           </div>
           <p class="mention-snippet">${snippet}</p>
         </article>
