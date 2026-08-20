@@ -114,7 +114,6 @@ async function mergeMention(
       url_canonical       = COALESCE(url_canonical, $10),
       content_fingerprint = COALESCE(content_fingerprint, $11),
       engagement          = GREATEST(engagement, $12),
-      ingest_count        = ingest_count + $13,
       last_seen_at        = now()
     WHERE id = $1
   `;
@@ -132,7 +131,6 @@ async function mergeMention(
     record.url_canonical,
     record.content_fingerprint,
     record.engagement,
-    record.observations.length,
   ]);
 }
 
@@ -168,6 +166,18 @@ async function recordObservations(
   return recorded;
 }
 
+async function bumpIngestCount(
+  client: import("pg").PoolClient,
+  mentionId: number,
+  delta: number,
+): Promise<void> {
+  if (delta <= 0) return;
+  await client.query(
+    "UPDATE mentions SET ingest_count = ingest_count + $2 WHERE id = $1",
+    [mentionId, delta],
+  );
+}
+
 export async function ingestCanonical(
   records: CanonicalMention[],
 ): Promise<IngestSummary> {
@@ -186,16 +196,19 @@ export async function ingestCanonical(
 
       if (existing) {
         await mergeMention(client, existing.id, record);
-        observationsRecorded += await recordObservations(
+        const newObservations = await recordObservations(
           client,
           existing.id,
           record,
           existing.match_layer,
         );
+        await bumpIngestCount(client, existing.id, newObservations);
+        observationsRecorded += newObservations;
         merged++;
       } else {
         const id = await insertMention(client, record);
-        observationsRecorded += await recordObservations(client, id, record, "new");
+        const newObservations = await recordObservations(client, id, record, "new");
+        observationsRecorded += newObservations;
         inserted++;
       }
     }
