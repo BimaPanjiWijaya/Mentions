@@ -352,6 +352,17 @@ Isinya mendokumentasikan tiga variabel wajib (`DATABASE_URL`, `PGSSL`,
 `PORT`) tanpa menaruh kredensial contoh yang bisa langsung disalin di
 dalam repo.
 
+**Bug `ingest_count` ditemukan saat testing manual.** Versi awal
+menambah `ingest_count` tanpa syarat setiap kali merge terjadi, jadi
+mem-posting file yang sama berulang kali tetap menaikkan angkanya
+meskipun jaminan idempotency di level agregat (`total_mentions`,
+`observations_recorded`) sudah benar. Diperbaiki dengan menghitung
+increment dari jumlah observasi yang benar-benar baru (hasil `ON
+CONFLICT DO NOTHING`), bukan dari ukuran batch mentah. Ditemukan lewat
+inspeksi manual satu record setelah ingest berulang, bukan dari unit
+test — pengingat bahwa idempotency di level agregat tidak menjamin
+idempotency di setiap kolom.
+
 ---
 
 ## Waktu yang dihabiskan

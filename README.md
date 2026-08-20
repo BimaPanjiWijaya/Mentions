@@ -331,6 +331,16 @@ comma separators, so it is safe here.
 the three required variables (`DATABASE_URL`, `PGSSL`, `PORT`) without a
 copy-pasteable fake credential sitting in the repo.
 
+**The `ingest_count` bug was found by manual testing, not a unit test.**
+The first version incremented `ingest_count` unconditionally on every
+merge, so re-posting the same file kept raising the count even though the
+aggregate idempotency guarantees (`total_mentions`, `observations_recorded`)
+were already correct. Fixed by deriving the increment from the number of
+observations that were genuinely new (the row count from `ON CONFLICT DO
+NOTHING`), not from the raw batch size. Found by manually inspecting one
+record after a repeated ingest, not by a unit test — a reminder that
+aggregate-level idempotency does not guarantee idempotency in every column.
+
 ---
 
 ## Time spent
