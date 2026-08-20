@@ -89,7 +89,7 @@ function renderStatTiles(list, bySource, byDay) {
   const range = days.length ? `${days[0].key} → ${days[days.length - 1].key}` : "—";
 
   container.innerHTML = `
-    <div class="stat-tile stat-hero">
+    <div class="stat-tile">
       <span class="stat-label">Mentions</span>
       <span class="stat-value">${total}</span>
     </div>
