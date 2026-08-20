@@ -128,11 +128,14 @@ function renderList(items) {
         ? new Date(item.published_at).toISOString().slice(0, 10)
         : "unknown date";
 
+      const color = colorForSource(item.source);
+      const badgeStyle = `color:${color};background:color-mix(in srgb, ${color} 14%, white)`;
+
       return `
-        <article class="mention-card">
+        <article class="mention-card" style="border-left-color:${color}">
           <h3>${titleHtml}</h3>
           <div class="mention-meta">
-            <span class="badge">${escapeHtml(item.source_display ?? item.source)}</span>
+            <span class="badge" style="${badgeStyle}">${escapeHtml(item.source_display ?? item.source)}</span>
             <span class="dot">&middot;</span>
             <span class="meta-date">${date}</span>
             <span class="dot">&middot;</span>
