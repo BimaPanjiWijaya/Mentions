@@ -47,20 +47,21 @@ body {
 }
 
 .masthead {
-  margin-bottom: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.75rem;
 }
 
 .masthead h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 2.3rem;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .subtitle {
-  margin: 0.3rem 0 0;
+  margin: 0.4rem 0 0;
   color: var(--text-muted);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
 }
 
 #status {
