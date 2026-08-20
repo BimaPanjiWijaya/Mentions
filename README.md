@@ -345,7 +345,7 @@ aggregate-level idempotency does not guarantee idempotency in every column.
 
 ## Time spent
 
-Roughly **10 hours across 3 sessions**, 18–20 August 2026:
+Roughly **13 hours across 4 sessions**, 18–20 August 2026:
 
 - **Session 1** (~1.5h, 18 Aug): project scaffold — repo structure, TypeScript
   + Express setup, dependency versions pinned, seed data committed.
@@ -357,6 +357,11 @@ Roughly **10 hours across 3 sessions**, 18–20 August 2026:
 - **Session 3** (~3.5h, 20 Aug): read-only dashboard, verification against a
   real local PostgreSQL instance (migration, seed, every endpoint hit by
   hand), cleaning up the commit history into logical steps, and this README.
+- **Session 4** (~3h, 20 Aug): cross-checked the whole build against the
+  official brief PDF, several rounds of dashboard redesign (visual polish,
+  then a full pass to make it responsive across phone/tablet/desktop widths),
+  and found + fixed the `ingest_count` idempotency bug described above,
+  including a real-database regression test for it.
 
 Built with Claude Code under close review — the brief explicitly allows this
 ("Use them. We do. There is no penalty"). The hours above are my own time:

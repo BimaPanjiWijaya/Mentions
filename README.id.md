@@ -367,7 +367,7 @@ idempotency di setiap kolom.
 
 ## Waktu yang dihabiskan
 
-Kira-kira **10 jam dalam 3 sesi**, 18–20 Agustus 2026:
+Kira-kira **13 jam dalam 4 sesi**, 18–20 Agustus 2026:
 
 - **Sesi 1** (~1,5 jam, 18 Agu): scaffold project — struktur repo, setup
   TypeScript + Express, versi dependency dipin, seed data di-commit.
@@ -379,6 +379,11 @@ Kira-kira **10 jam dalam 3 sesi**, 18–20 Agustus 2026:
 - **Sesi 3** (~3,5 jam, 20 Agu): dashboard read-only, verifikasi ke instance
   PostgreSQL lokal sungguhan (migration, seed, tiap endpoint dicoba manual),
   merapikan commit history jadi langkah-langkah logis, dan README ini.
+- **Sesi 4** (~3 jam, 20 Agu): mencocokkan ulang seluruh hasil kerja dengan
+  brief PDF resmi, beberapa putaran redesign dashboard (polish visual,
+  lalu satu putaran penuh supaya responsive di lebar layar HP/tablet/laptop),
+  dan menemukan + memperbaiki bug idempotency `ingest_count` di atas,
+  termasuk menulis test regresi terhadap database sungguhan untuk itu.
 
 Dikerjakan dengan Claude Code di bawah review ketat — brief-nya eksplisit
 mengizinkan ini ("Use them. We do. There is no penalty"). Jam di atas adalah
